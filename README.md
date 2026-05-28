@@ -1,4 +1,5 @@
 # DRIA V2
+https://github.com/user-attachments/assets/7de70c8a-b837-4f2e-9982-18e2bda8dba6
 
 DRIA is a local-first Deep Research and Intelligence Agent with realtime voice,
 optional Anam avatar video, local web search, and background multi-agent deep
@@ -13,6 +14,10 @@ search, or scraping APIs:
 - Deep research search/scrape: self-hosted Firecrawl backed by SearXNG
 - Voice/UI bridge: FastRTC plus FastAPI
 - Optional avatar: Anam passthrough, enabled only when you start an avatar session
+
+
+
+
 
 ## Architecture
 
