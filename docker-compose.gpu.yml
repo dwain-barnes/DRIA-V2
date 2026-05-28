@@ -61,6 +61,8 @@ services:
       dockerfile: docker/speech-to-speech/Dockerfile
     image: dria-speech-to-speech:0.2.6-cu130
     gpus: all
+    depends_on:
+      - llama-cpp
     environment:
       OPENAI_API_KEY: ${OPENAI_API_KEY:-not-needed}
       S2S_RESPONSES_API_BASE_URL: ${S2S_RESPONSES_API_BASE_URL:-http://llama-cpp:8080/v1}

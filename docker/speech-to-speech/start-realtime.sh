@@ -3,10 +3,50 @@ set -euo pipefail
 
 export OPENAI_API_KEY="${OPENAI_API_KEY:-not-needed}"
 
+responses_api_base_url="${S2S_RESPONSES_API_BASE_URL:-http://llama-cpp:8080/v1}"
 local_ref_audio="${S2S_LOCAL_REF_AUDIO:-/workspace/main_voice.wav}"
 local_ref_text="${S2S_LOCAL_REF_TEXT:-If the red of the second ball falls upon the green of the first, the result is to give a ball with an abnormally wide yellow band since red and green light when mixed form yellow.}"
 default_ref_audio_url="${S2S_DEFAULT_REF_AUDIO_URL:-https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen3-TTS-Repo/clone.wav}"
 default_ref_text="${S2S_DEFAULT_REF_TEXT:-Okay. Yeah. I resent you. I love you. I respect you. But you know what? You blew it! And thanks to you.}"
+
+python - "$responses_api_base_url" "${S2S_LLM_STARTUP_TIMEOUT:-900}" "${S2S_LLM_STARTUP_CHECK_INTERVAL:-5}" <<'PY'
+import http.client
+import sys
+import time
+import urllib.parse
+
+
+base_url = sys.argv[1]
+timeout = float(sys.argv[2])
+interval = float(sys.argv[3])
+url = urllib.parse.urlparse(base_url)
+models_path = f"{url.path.rstrip('/')}/models"
+deadline = time.time() + timeout
+last_error = "not checked yet"
+
+while time.time() < deadline:
+    conn = None
+    try:
+        conn_class = http.client.HTTPSConnection if url.scheme == "https" else http.client.HTTPConnection
+        conn = conn_class(url.hostname, url.port, timeout=5)
+        conn.request("GET", models_path)
+        response = conn.getresponse()
+        response.read()
+        if response.status < 500:
+            print(f"Responses API ready at {base_url}")
+            sys.exit(0)
+        last_error = f"HTTP {response.status}"
+    except Exception as exc:
+        last_error = str(exc)
+    finally:
+        if conn:
+            conn.close()
+
+    print(f"Waiting for Responses API at {base_url}: {last_error}", flush=True)
+    time.sleep(interval)
+
+raise SystemExit(f"Timed out waiting for Responses API at {base_url}: {last_error}")
+PY
 
 if [[ -n "${S2S_QWEN3_REF_AUDIO:-}" ]]; then
   ref_audio="$S2S_QWEN3_REF_AUDIO"
@@ -36,7 +76,7 @@ args=(
   --parakeet_tdt_device "${S2S_PARAKEET_DEVICE:-cuda}"
   --llm_backend responses-api
   --responses_api_api_key "${S2S_RESPONSES_API_KEY:-not-needed}"
-  --responses_api_base_url "${S2S_RESPONSES_API_BASE_URL:-http://llama-cpp:8080/v1}"
+  --responses_api_base_url "$responses_api_base_url"
   --model_name "${S2S_MODEL_NAME:-gemma-4-E4B-it}"
   --responses_api_stream "${S2S_RESPONSES_API_STREAM:-true}"
   --stream_batch_sentences "${S2S_STREAM_BATCH_SENTENCES:-1}"
