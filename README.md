@@ -54,15 +54,16 @@ For the full Docker stack:
 
 - Docker Desktop with Docker Compose v2.
 - NVIDIA GPU support in Docker if you run the GPU llama.cpp and speech services.
-- Local GGUF model files for llama.cpp.
-- Enough RAM/VRAM for your selected model, speech models, Firecrawl, and browser
-  extraction services.
+- Internet access on first run so Docker can pull images and download the local
+  model, ASR, and TTS assets into Docker volumes.
+- Enough RAM/VRAM and disk space for the selected model, speech models,
+  Firecrawl, and browser extraction services.
 
 Optional:
 
 - An Anam API key if you want the avatar.
-- A custom reference voice file for speech-to-speech. The default compose expects
-  `main_voice.wav`.
+- A custom reference voice file named `main_voice.wav`. The file is ignored by
+  git, but Docker will use it automatically when it exists.
 
 ## Quick Start: Full Docker Stack
 
@@ -114,7 +115,17 @@ http://127.0.0.1:7860/ui
 ```
 
 The first run can take a while because Docker pulls Firecrawl, SearXNG,
-RabbitMQ, Redis, Postgres, llama.cpp, and builds the speech image.
+RabbitMQ, Redis, Postgres, llama.cpp, builds the speech image, and downloads:
+
+- `gemma-4-E4B-it-Q8_0.gguf` for the local LLM.
+- `mmproj-BF16.gguf` for llama.cpp vision/multimodal support.
+- The speech-to-speech ASR/TTS models.
+- A public Qwen3-TTS reference clip, only if `main_voice.wav` is not present.
+
+If `main_voice.wav` exists in the project folder, speech-to-speech uses that
+local ignored voice file instead of the public fallback. If you replace
+`main_voice.wav` with a recording that says different words, set
+`S2S_LOCAL_REF_TEXT` in `.env` to the exact text spoken in the clip.
 
 ## Services And Ports
 

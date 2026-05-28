@@ -3,6 +3,31 @@ set -euo pipefail
 
 export OPENAI_API_KEY="${OPENAI_API_KEY:-not-needed}"
 
+local_ref_audio="${S2S_LOCAL_REF_AUDIO:-/workspace/main_voice.wav}"
+local_ref_text="${S2S_LOCAL_REF_TEXT:-If the red of the second ball falls upon the green of the first, the result is to give a ball with an abnormally wide yellow band since red and green light when mixed form yellow.}"
+default_ref_audio_url="${S2S_DEFAULT_REF_AUDIO_URL:-https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen3-TTS-Repo/clone.wav}"
+default_ref_text="${S2S_DEFAULT_REF_TEXT:-Okay. Yeah. I resent you. I love you. I respect you. But you know what? You blew it! And thanks to you.}"
+
+if [[ -n "${S2S_QWEN3_REF_AUDIO:-}" ]]; then
+  ref_audio="$S2S_QWEN3_REF_AUDIO"
+  ref_text="${S2S_QWEN3_REF_TEXT:-$local_ref_text}"
+elif [[ -s "$local_ref_audio" ]]; then
+  echo "Using local TTS reference voice: $local_ref_audio" >&2
+  ref_audio="$local_ref_audio"
+  ref_text="${S2S_QWEN3_REF_TEXT:-$local_ref_text}"
+else
+  ref_audio="${S2S_DEFAULT_REF_AUDIO_PATH:-/models/qwen3-tts/clone.wav}"
+  ref_text="${S2S_QWEN3_REF_TEXT:-$default_ref_text}"
+  mkdir -p "$(dirname "$ref_audio")"
+
+  if [[ ! -s "$ref_audio" ]]; then
+    echo "No local TTS reference voice found. Downloading default Qwen3-TTS reference audio." >&2
+    tmp_ref_audio="${ref_audio}.tmp"
+    curl -fsSL "$default_ref_audio_url" -o "$tmp_ref_audio"
+    mv "$tmp_ref_audio" "$ref_audio"
+  fi
+fi
+
 args=(
   --mode realtime
   --ws_host "${S2S_WS_HOST:-0.0.0.0}"
@@ -18,8 +43,8 @@ args=(
   --tts "${S2S_TTS:-qwen3}"
   --qwen3_tts_model_name "${S2S_QWEN3_TTS_MODEL_NAME:-Qwen/Qwen3-TTS-12Hz-1.7B-Base}"
   --qwen3_tts_device "${S2S_QWEN3_TTS_DEVICE:-cuda}"
-  --qwen3_tts_ref_audio "${S2S_QWEN3_REF_AUDIO:-/app/main_voice.wav}"
-  --qwen3_tts_ref_text "${S2S_QWEN3_REF_TEXT:-If the red of the second ball falls upon the green of the first, the result is to give a ball with an abnormally wide yellow band since red and green light when mixed form yellow.}"
+  --qwen3_tts_ref_audio "$ref_audio"
+  --qwen3_tts_ref_text "$ref_text"
   --qwen3_tts_language "${S2S_QWEN3_TTS_LANGUAGE:-auto}"
   --qwen3_tts_non_streaming_mode "${S2S_QWEN3_NON_STREAMING_MODE:-True}"
   --min_silence_ms "${S2S_MIN_SILENCE_MS:-550}"
