@@ -81,17 +81,19 @@ copy .env.example .env
 
 3. Edit `.env` for your machine.
 
-At minimum, check these values:
+For avatar support, paste your Anam key after the equals sign:
 
 ```text
-LLAMA_CPP_MODEL_DIR=C:/path/to/model/snapshot
-LLAMA_CPP_MODEL_FILE=your-model.gguf
-LLAMA_CPP_MMPROJ_FILE=your-mmproj.gguf
-S2S_REF_AUDIO_PATH=./main_voice.wav
 ANAM_API_KEY=
+ANAM_ENABLED=true
+ANAM_AVATAR_ID=30fa96d0-26c4-4e55-94a0-517025942e18
+ANAM_AVATAR_MODEL=cara-3
+ANAM_PERSONA_NAME=DRIA
 ```
 
-Leave `ANAM_API_KEY` empty if you do not want avatar support.
+Leave `ANAM_API_KEY` empty, or set `ANAM_ENABLED=false`, if you do not want
+avatar support. Advanced model paths, ports, and service settings can also be
+overridden in `.env` when your machine needs different values.
 
 4. Start everything.
 
@@ -183,7 +185,9 @@ Common settings:
 | `AGENT_MEMORY_ENABLED` | Enable private memory writes to `MEMORY.md` | `false` |
 | `VISION_ENABLED` | Enable camera snapshot analysis | `false` |
 
-See [.env.example](./.env.example) for the complete set.
+See [.env.example](./.env.example) for the minimal local template. Advanced
+optional values can also be overridden in `.env`; the Docker compose files and
+`app.py` show the defaults used by the app.
 
 ## Deep Research
 
