@@ -27,6 +27,7 @@ custom_voices/
 *.m4a
 *.aac
 *.ogg
+!main_voice.wav
 
 *.key
 *.pem
