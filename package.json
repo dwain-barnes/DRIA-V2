@@ -1,0 +1,22 @@
+{
+  "name": "dria-local-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "bootstrap:agent-core": "node dria-stack/bootstrap-agent-core.mjs",
+    "research": "tsx dria-stack/dria-research.ts"
+  },
+  "dependencies": {
+    "@langchain/core": "^1.1.39",
+    "@langchain/openai": "^1.4.4",
+    "ai": "^6.0.0",
+    "deepagents": "^1.9.0",
+    "firecrawl-aisdk": "0.12.0-beta.2",
+    "gray-matter": "^4.0.3",
+    "just-bash": "^2.14.0",
+    "langchain": "^1.3.1",
+    "tsx": "^4.20.6",
+    "zod": "^3.25.0"
+  }
+}

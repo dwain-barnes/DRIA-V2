@@ -1,0 +1,503 @@
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  min-height: 100%;
+  background: #05070a !important;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+}
+
+#dria-call-shell {
+  min-height: 64vh;
+  padding: clamp(28px, 6vh, 72px) 24px 18px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(56, 67, 84, 0.26), transparent 36%),
+    linear-gradient(180deg, #05070a 0%, #07090d 58%, #05070a 100%);
+  color: #f7f9fc;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+#dria-call-shell,
+#dria-call-shell * {
+  box-sizing: border-box;
+}
+
+#dria-call-shell[hidden] {
+  display: none;
+}
+
+.dria-call-stage {
+  width: min(1120px, 100%);
+  min-height: min(620px, 68vh);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 36px;
+}
+
+.dria-video-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+  gap: clamp(18px, 4vw, 56px);
+  align-items: center;
+  padding-top: clamp(12px, 4vh, 48px);
+}
+
+.dria-video-card {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 42%),
+    #111823;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.46);
+}
+
+.dria-video-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.dria-video-card video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  background: #111823;
+}
+
+.dria-user-card video {
+  transform: scaleX(-1);
+}
+
+.dria-video-label {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 3;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(5, 7, 10, 0.62);
+  color: #f7f9fc;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  backdrop-filter: blur(10px);
+}
+
+.dria-video-placeholder {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 24px;
+  text-align: center;
+  color: #d7dde7;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.06), transparent 44%),
+    #111823;
+}
+
+#dria-avatar-placeholder {
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 16px;
+  text-align: left;
+  background: #111823;
+}
+
+#dria-avatar-placeholder::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(5, 7, 10, 0.12), rgba(5, 7, 10, 0.24) 58%, rgba(5, 7, 10, 0.7)),
+    radial-gradient(circle at 50% 24%, transparent 0 38%, rgba(5, 7, 10, 0.22) 78%);
+}
+
+.dria-avatar-still {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
+.dria-avatar-off-state {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: min(260px, 74%);
+  padding: 9px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: rgba(5, 7, 10, 0.56);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(12px);
+}
+
+.dria-video-placeholder[hidden] {
+  display: none;
+}
+
+.dria-video-placeholder strong {
+  font-size: clamp(18px, 2vw, 26px);
+  font-weight: 750;
+  line-height: 1.1;
+}
+
+.dria-video-placeholder span {
+  font-size: 13px;
+  color: #98a2b3;
+}
+
+.dria-video-live {
+  border-color: rgba(125, 174, 255, 0.36);
+}
+
+.dria-call-dock {
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: min(100%, 760px);
+  min-height: 54px;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 999px;
+  background: rgba(13, 17, 23, 0.86);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.46);
+  backdrop-filter: blur(18px);
+}
+
+.dria-control-pill,
+.dria-avatar-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #f7f9fc;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.dria-control-pill input {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: #7daeff;
+}
+
+.dria-avatar-actions {
+  padding: 0;
+  overflow: hidden;
+  gap: 0;
+}
+
+.dria-avatar-actions button {
+  min-width: 58px;
+  min-height: 38px;
+  border: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent;
+  color: #f7f9fc;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.dria-avatar-actions button:last-child {
+  border-right: 0;
+}
+
+.dria-avatar-actions button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.dria-avatar-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.44;
+}
+
+#dria-anam-start:not(:disabled) {
+  color: #ffffff;
+  background: rgba(47, 111, 237, 0.86);
+}
+
+#dria-anam-stop:not(:disabled) {
+  color: #ffd8d4;
+  background: rgba(180, 35, 24, 0.28);
+}
+
+.dria-anam-status {
+  min-width: 160px;
+  max-width: 260px;
+  color: #b7c1d0;
+  font-size: 12px;
+  line-height: 1.25;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.dria-anam-status[data-state="error"] {
+  color: #ffb4ab;
+}
+
+.dria-anam-status[data-state="ready"] {
+  color: #9ce6b3;
+}
+
+gradio-app {
+  display: block;
+  width: min(920px, calc(100% - 32px));
+  margin: 0 auto 24px;
+  color: #f7f9fc;
+  background: transparent !important;
+}
+
+gradio-app main,
+gradio-app .wrap,
+gradio-app .contain,
+gradio-app .column,
+gradio-app .row {
+  background: transparent !important;
+}
+
+gradio-app #component-2,
+gradio-app footer {
+  display: none !important;
+}
+
+gradio-app #component-3 {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+}
+
+gradio-app #component-4 {
+  width: min(620px, 100%) !important;
+  max-width: 620px !important;
+  margin: 0 auto !important;
+  flex-grow: 0 !important;
+}
+
+gradio-app #component-0 {
+  display: none !important;
+}
+
+body.dria-show-transcript gradio-app #component-0 {
+  display: flex !important;
+  width: 100% !important;
+  height: min(420px, 42vh) !important;
+  min-height: 280px !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.035) !important;
+  color: #f7f9fc !important;
+  box-shadow: none !important;
+  overflow: auto !important;
+}
+
+body.dria-show-transcript gradio-app #component-0 * {
+  overflow-wrap: anywhere !important;
+}
+
+body.dria-show-transcript gradio-app #component-0 p,
+body.dria-show-transcript gradio-app #component-0 span,
+body.dria-show-transcript gradio-app #component-0 div {
+  white-space: pre-wrap !important;
+}
+
+gradio-app #component-5 {
+  position: relative !important;
+  width: min(640px, 100%) !important;
+  height: 176px !important;
+  min-height: 176px !important;
+  max-height: none !important;
+  margin: 0 auto 14px !important;
+  padding: 20px 18px 16px !important;
+  border: 1px solid rgba(125, 174, 255, 0.16) !important;
+  border-radius: 28px !important;
+  background:
+    linear-gradient(180deg, rgba(18, 25, 35, 0.78), rgba(7, 10, 15, 0.88)) !important;
+  color: #f7f9fc !important;
+  box-shadow: 0 18px 58px rgba(0, 0, 0, 0.34) !important;
+  overflow: visible !important;
+}
+
+gradio-app #component-5::before {
+  content: "Voice";
+  position: absolute;
+  top: 12px;
+  left: 18px;
+  z-index: 2;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(5, 7, 10, 0.64);
+  color: #b7c1d0;
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0;
+}
+
+gradio-app #component-5 > label {
+  display: none !important;
+}
+
+gradio-app #component-5 .audio-container {
+  height: 140px !important;
+  min-height: 140px !important;
+  max-height: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: visible !important;
+}
+
+gradio-app #component-5 [title="grant webcam access"],
+gradio-app #component-5 [title="grant webcam access"] button,
+gradio-app #component-5 [title="grant webcam access"] .wrap {
+  height: 140px !important;
+  min-height: 140px !important;
+  max-height: none !important;
+  background: transparent !important;
+  color: #f7f9fc !important;
+}
+
+gradio-app #component-5 canvas,
+gradio-app #component-5 svg {
+  filter: hue-rotate(185deg) saturate(0.9) brightness(1.25);
+}
+
+gradio-app #component-5 button {
+  position: relative !important;
+  z-index: 4 !important;
+  min-height: 42px !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #f7f9fc !important;
+  font-weight: 750 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28) !important;
+}
+
+gradio-app #component-5 button:hover {
+  background: rgba(125, 174, 255, 0.18) !important;
+}
+
+gradio-app #component-5 .controls,
+gradio-app #component-5 [class*="controls"],
+gradio-app #component-5 [class*="toolbar"],
+gradio-app #component-5 [class*="record"] {
+  position: relative !important;
+  z-index: 5 !important;
+  margin-top: 8px !important;
+  transform: none !important;
+}
+
+@media (max-width: 820px) {
+  #dria-call-shell {
+    padding: 18px 12px;
+  }
+
+  .dria-call-stage {
+    min-height: auto;
+    gap: 20px;
+  }
+
+  .dria-video-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding-top: 0;
+  }
+
+  .dria-call-dock {
+    width: 100%;
+    border-radius: 18px;
+    flex-wrap: wrap;
+  }
+
+  .dria-control-pill {
+    flex: 1 1 130px;
+    justify-content: center;
+  }
+
+  .dria-avatar-actions {
+    flex: 1 1 150px;
+  }
+
+  .dria-avatar-actions button {
+    flex: 1 1 50%;
+  }
+
+  .dria-anam-status {
+    flex-basis: 100%;
+    min-width: 0;
+    max-width: none;
+    text-align: center;
+  }
+}
+
+@media (max-width: 820px) {
+  gradio-app #component-5 {
+    height: 156px !important;
+    min-height: 156px !important;
+    padding: 18px 12px 14px !important;
+  }
+
+  gradio-app #component-5 .audio-container,
+  gradio-app #component-5 [title="grant webcam access"],
+  gradio-app #component-5 [title="grant webcam access"] button,
+  gradio-app #component-5 [title="grant webcam access"] .wrap {
+    height: 124px !important;
+    min-height: 124px !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .dria-call-dock {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .dria-control-pill,
+  .dria-avatar-actions {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .dria-avatar-actions,
+  .dria-anam-status {
+    grid-column: 1 / -1;
+    font-size: 11px;
+  }
+}

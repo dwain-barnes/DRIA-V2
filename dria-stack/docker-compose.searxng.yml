@@ -1,0 +1,41 @@
+# Compose override that adds SearXNG to Firecrawl's self-host stack.
+#
+# Usage from inside a cloned firecrawl repo:
+#
+#   docker compose -f docker-compose.yaml -f /path/to/dria-stack/docker-compose.searxng.yml up -d
+#
+# The override joins Firecrawl's backend network, so the api container can reach
+# SearXNG at http://searxng:8080. Wire that address into Firecrawl's .env with
+# SEARXNG_ENDPOINT from .env.firecrawl-additions.
+
+name: firecrawl
+
+services:
+  searxng:
+    image: searxng/searxng:latest
+    container_name: firecrawl-searxng
+    networks:
+      - backend
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./searxng:/etc/searxng:rw
+    environment:
+      SEARXNG_BASE_URL: "http://localhost:8081/"
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+        compress: "true"
+
+networks:
+  backend:
+    driver: bridge

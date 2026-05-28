@@ -1,0 +1,11 @@
+name: fastrtc-realtime
+channels:
+  - defaults
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - fastrtc[vad]==0.0.34
+      - websockets==15.0.1
+      - python-dotenv==1.2.2
+      - livekit==1.1.7

@@ -1,0 +1,23 @@
+@echo off
+cd /d "%~dp0"
+set "REALTIME_MODEL=gemma-4-E4B-it"
+set "REALTIME_SOUL_FILE=%~dp0SOUL.md"
+set "FASTRTC_OUTPUT_FRAME_SIZE=480"
+set "FASTRTC_LIVEKIT_AEC=1"
+if not defined AGENT_SKILLS_ENABLED set "AGENT_SKILLS_ENABLED=1"
+if not defined AGENT_SKILLS_REGISTER_TOOLS set "AGENT_SKILLS_REGISTER_TOOLS=1"
+if not defined AGENT_MEMORY_ENABLED set "AGENT_MEMORY_ENABLED=1"
+if not defined AGENT_MEMORY_API_BASE_URL set "AGENT_MEMORY_API_BASE_URL=http://localhost:8080/v1"
+if not defined AGENT_MEMORY_MODEL set "AGENT_MEMORY_MODEL=%REALTIME_MODEL%"
+if not defined AGENT_MEMORY_API_KIND set "AGENT_MEMORY_API_KIND=chat"
+if not defined AGENT_MEMORY_CONSOLIDATE_EVERY set "AGENT_MEMORY_CONSOLIDATE_EVERY=5"
+if not defined ANAM_ENABLED set "ANAM_ENABLED=1"
+if not defined ANAM_AVATAR_ID set "ANAM_AVATAR_ID=30fa96d0-26c4-4e55-94a0-517025942e18"
+if not defined ANAM_AVATAR_MODEL set "ANAM_AVATAR_MODEL=cara-3"
+if not defined ANAM_PERSONA_NAME set "ANAM_PERSONA_NAME=DRIA"
+if not defined VISION_ENABLED set "VISION_ENABLED=1"
+if not defined VISION_API_BASE_URL set "VISION_API_BASE_URL=http://localhost:8080/v1"
+if not defined VISION_MODEL set "VISION_MODEL=%REALTIME_MODEL%"
+if not defined VISION_API_KIND set "VISION_API_KIND=chat"
+
+C:\Users\Dwain-Admin\miniconda3\envs\fastrtc-realtime\python.exe app.py

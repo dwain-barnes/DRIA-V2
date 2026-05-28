@@ -1,0 +1,189 @@
+name: dria
+
+services:
+  app:
+    build:
+      context: .
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      FASTRTC_HOST: 0.0.0.0
+      FASTRTC_PORT: 7860
+      FASTRTC_MODE: ui
+      REALTIME_WS_URL: ${REALTIME_WS_URL:-ws://host.docker.internal:8765/v1/realtime}
+      VISION_API_BASE_URL: ${VISION_API_BASE_URL:-http://host.docker.internal:8080/v1}
+      VISION_MODEL: ${VISION_MODEL:-gemma-4-E4B-it}
+      LLAMACPP_BASE_URL: ${LLAMACPP_BASE_URL:-http://host.docker.internal:8080/v1}
+      LOCAL_MODEL: ${LOCAL_MODEL:-gemma-4-E4B-it}
+      FIRECRAWL_API_URL: ${DRIA_INTERNAL_FIRECRAWL_API_URL:-http://firecrawl:3002}
+      SEARXNG_BASE_URL: ${DRIA_INTERNAL_SEARXNG_BASE_URL:-http://searxng:8080}
+      SEARXNG_TIMEOUT: ${SEARXNG_TIMEOUT:-8}
+      DRIA_DEEP_RESEARCH_ENABLED: ${DRIA_DEEP_RESEARCH_ENABLED:-true}
+      DRIA_DEEP_RESEARCH_TIMEOUT: ${DRIA_DEEP_RESEARCH_TIMEOUT:-900}
+      DRIA_DEEP_RESEARCH_MAX_JOBS: ${DRIA_DEEP_RESEARCH_MAX_JOBS:-2}
+      DRIA_DEEP_RESEARCH_MAX_QUEUE: ${DRIA_DEEP_RESEARCH_MAX_QUEUE:-8}
+      DRIA_AGENT_MAX_OUTPUT_TOKENS: ${DRIA_AGENT_MAX_OUTPUT_TOKENS:-1024}
+      DRIA_RESEARCH_MAX_WORKERS: ${DRIA_RESEARCH_MAX_WORKERS:-2}
+      DRIA_RESEARCH_WORKER_MAX_STEPS: ${DRIA_RESEARCH_WORKER_MAX_STEPS:-24}
+      DRIA_RESEARCH_SYNTHESIS_MAX_TOKENS: ${DRIA_RESEARCH_SYNTHESIS_MAX_TOKENS:-2048}
+      SKILLS_DIR: /app/agent_skills
+      AGENT_MEMORY_FILE: /app/data/MEMORY.md
+      DRIA_RESEARCH_RESULTS_DIR: /app/research_results
+    ports:
+      - "7860:7860"
+    volumes:
+      - dria_data:/app/data
+      - dria_research_results:/app/research_results
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - searxng
+      - firecrawl
+    restart: unless-stopped
+
+  searxng:
+    image: searxng/searxng:latest
+    ports:
+      - "${SEARXNG_HOST_PORT:-8081}:8080"
+    volumes:
+      - ./dria-stack/searxng:/etc/searxng:rw
+    environment:
+      SEARXNG_BASE_URL: ${SEARXNG_PUBLIC_BASE_URL:-http://localhost:8081/}
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+        compress: "true"
+    restart: unless-stopped
+
+  firecrawl:
+    image: ghcr.io/firecrawl/firecrawl:latest
+    command: node dist/src/harness.js --start-docker
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3002
+      EXTRACT_WORKER_PORT: 3004
+      WORKER_PORT: 3005
+      ENV: local
+      REDIS_URL: redis://firecrawl-redis:6379
+      REDIS_RATE_LIMIT_URL: redis://firecrawl-redis:6379
+      PLAYWRIGHT_MICROSERVICE_URL: http://firecrawl-playwright:3000/scrape
+      POSTGRES_USER: ${FIRECRAWL_POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${FIRECRAWL_POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${FIRECRAWL_POSTGRES_DB:-postgres}
+      POSTGRES_HOST: firecrawl-postgres
+      POSTGRES_PORT: 5432
+      USE_DB_AUTHENTICATION: "false"
+      NUM_WORKERS_PER_QUEUE: ${FIRECRAWL_NUM_WORKERS_PER_QUEUE:-2}
+      CRAWL_CONCURRENT_REQUESTS: ${FIRECRAWL_CRAWL_CONCURRENT_REQUESTS:-4}
+      MAX_CONCURRENT_JOBS: ${FIRECRAWL_MAX_CONCURRENT_JOBS:-2}
+      BROWSER_POOL_SIZE: ${FIRECRAWL_BROWSER_POOL_SIZE:-2}
+      NUQ_RABBITMQ_URL: amqp://firecrawl-rabbitmq:5672
+      HARNESS_STARTUP_TIMEOUT_MS: ${FIRECRAWL_HARNESS_STARTUP_TIMEOUT_MS:-60000}
+      BULL_AUTH_KEY: ${FIRECRAWL_BULL_AUTH_KEY:-dria-local}
+      SEARXNG_ENDPOINT: http://searxng:8080
+      SEARXNG_ENGINES: ${SEARXNG_ENGINES:-}
+      SEARXNG_CATEGORIES: ${SEARXNG_CATEGORIES:-general}
+      OPENAI_BASE_URL: ${FIRECRAWL_OPENAI_BASE_URL:-}
+      OPENAI_API_KEY: ${FIRECRAWL_OPENAI_API_KEY:-}
+      MODEL_NAME: ${FIRECRAWL_MODEL_NAME:-}
+      LOGGING_LEVEL: ${FIRECRAWL_LOGGING_LEVEL:-info}
+    depends_on:
+      firecrawl-redis:
+        condition: service_started
+      firecrawl-playwright:
+        condition: service_started
+      firecrawl-rabbitmq:
+        condition: service_healthy
+      firecrawl-postgres:
+        condition: service_started
+      searxng:
+        condition: service_started
+    ports:
+      - "${FIRECRAWL_HOST_PORT:-3002}:3002"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        compress: "true"
+    restart: unless-stopped
+
+  firecrawl-playwright:
+    image: ghcr.io/firecrawl/playwright-service:latest
+    environment:
+      PORT: 3000
+      MAX_CONCURRENT_PAGES: ${FIRECRAWL_CRAWL_CONCURRENT_REQUESTS:-4}
+      BLOCK_MEDIA: ${FIRECRAWL_BLOCK_MEDIA:-}
+      ALLOW_LOCAL_WEBHOOKS: ${FIRECRAWL_ALLOW_LOCAL_WEBHOOKS:-true}
+      PROXY_SERVER: ${PROXY_SERVER:-}
+      PROXY_USERNAME: ${PROXY_USERNAME:-}
+      PROXY_PASSWORD: ${PROXY_PASSWORD:-}
+    tmpfs:
+      - /tmp/.cache:noexec,nosuid,size=1g
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        compress: "true"
+    restart: unless-stopped
+
+  firecrawl-redis:
+    image: redis:alpine
+    command: redis-server --bind 0.0.0.0
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+        compress: "true"
+    restart: unless-stopped
+
+  firecrawl-rabbitmq:
+    image: rabbitmq:3-management
+    command: rabbitmq-server
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_running"]
+      interval: 5s
+      timeout: 5s
+      retries: 6
+      start_period: 5s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+        compress: "true"
+    restart: unless-stopped
+
+  firecrawl-postgres:
+    image: ghcr.io/firecrawl/nuq-postgres:latest
+    environment:
+      POSTGRES_USER: ${FIRECRAWL_POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${FIRECRAWL_POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${FIRECRAWL_POSTGRES_DB:-postgres}
+    volumes:
+      - firecrawl_postgres:/var/lib/postgresql/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        compress: "true"
+    restart: unless-stopped
+
+volumes:
+  dria_data:
+  dria_research_results:
+  firecrawl_postgres:
