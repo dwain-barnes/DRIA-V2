@@ -340,14 +340,19 @@ npm.cmd run bootstrap:agent-core
 Run the Python app locally:
 
 ```bat
-run_fastrtc.cmd
+python app.py
 ```
 
-Run host-side llama.cpp and speech services:
+Host-side llama.cpp and speech service runner scripts are machine-specific and
+intentionally ignored. Use the full Docker stack for the portable setup, or
+create your own local scripts for your machine.
 
-```bat
+Machine-specific files that should stay local:
+
+```text
 run_llama_cpp.cmd
 run_backend_cuda.cmd
+run_fastrtc.cmd
 ```
 
 Run the TypeScript research runner directly:

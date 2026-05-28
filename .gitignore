@@ -20,6 +20,11 @@ research_results/*
 node_modules/
 dria-stack/agent-core/
 
+# Machine-specific local runner scripts.
+run_backend_cuda.cmd
+run_fastrtc.cmd
+run_llama_cpp.cmd
+
 custom_voices/
 *.wav
 *.mp3
