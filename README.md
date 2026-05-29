@@ -436,6 +436,21 @@ Local model context errors:
 - Increase `LLAMA_CPP_CONTEXT`.
 - Reduce `LLAMA_CPP_PARALLEL` so each slot has more context.
 
+## Acknowledgements
+
+DRIA V2 builds on several open source projects and model releases:
+
+- Hugging Face `speech-to-speech` for the realtime ASR/TTS service.
+- `llama.cpp` for local OpenAI-compatible LLM serving.
+- SearXNG and Firecrawl for local search, scraping, and deep research.
+- FastRTC and FastAPI for the browser voice UI and app bridge.
+- Qwen3-TTS, NVIDIA Parakeet, and Gemma model releases used by the default
+  Docker setup.
+- The bundled `main_voice.wav` reference voice is from the CSTR VCTK Corpus.
+
+Third-party models, datasets, and services remain under their own licenses.
+
 ## License
 
-Add your chosen license before publishing publicly.
+DRIA V2 is released under the MIT License. See [LICENSE](./LICENSE) for the
+full license text.
